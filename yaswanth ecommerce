@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple E-Commerce</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+
+    header {
+      background: #333;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .product {
+      background: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .product img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: contain;
+    }
+
+    .product h3 {
+      margin: 10px 0;
+    }
+
+    .product p {
+      color: #555;
+    }
+
+    .product button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .product button:hover {
+      background: #218838;
+    }
+
+    #cartBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    #cartModal {
+      display: none;
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      width: 300px;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 20px;
+      z-index: 1001;
+    }
+
+    #cartModal h2 {
+      margin-top: 0;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .cart-item span {
+      color: #333;
+    }
+
+    .close-btn {
+      background: red;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      float: right;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Clothing E-Commerce Store</h1>
+  </header>
+
+  <button id="cartBtn">🛒 Cart (<span id="cartCount">0</span>)</button>
+
+  <div class="container">
+    <div class="products" id="productList">
+      <!-- Products will be loaded here -->
+    </div>
+  </div>
+
+  <div id="cartModal">
+    <button class="close-btn" onclick="toggleCart()">X</button>
+    <h2>Your Cart</h2>
+    <div id="cartItems"></div>
+    <hr />
+    <p><strong>Total: $<span id="totalPrice">0.00</span></strong></p>
+  </div>
+
+  <script>
+    const products = [
+      { id: 1, name: "Denim Jacket", price: 49.99, image: "https://via.placeholder.com/200x150?text=Denim+Jacket" },
+      { id: 2, name: "White T-shirt", price: 19.99, image: "https://via.placeholder.com/200x150?text=White+T-shirt" },
+      { id: 3, name: "Skinny Jeans", price: 39.99, image: "https://via.placeholder.com/200x150?text=Skinny+Jeans" },
+      { id: 4, name: "Polo Shirt", price: 24.99, image: "https://via.placeholder.com/200x150?text=Polo+Shirt" },
+      { id: 5, name: "Summer Dress", price: 29.99, image: "https://via.placeholder.com/200x150?text=Summer+Dress" },
+    ];
+
+    let cart = [];
+
+    function renderProducts() {
+      const productList = document.getElementById('productList');
+      productList.innerHTML = '';
+      products.forEach(product => {
+        productList.innerHTML += `
+          <div class="product">
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>$${product.price.toFixed(2)}</p>
+            <button onclick="addToCart(${product.id})">Add to Cart</button>
+          </div>
+        `;
+      });
+    }
+
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...product, qty: 1 });
+      }
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById('cartItems');
+      const cartCount = document.getElementById('cartCount');
+      const totalPriceEl = document.getElementById('totalPrice');
+      cartItems.innerHTML = '';
+
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price * item.qty;
+        cartItems.innerHTML += `
+          <div class="cart-item">
+            <span>${item.name} x${item.qty}</span>
+            <span>$${(item.price * item.qty).toFixed(2)}</span>
+          </div>
+        `;
+      });
+
+      cartCount.innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+      totalPriceEl.innerText = total.toFixed(2);
+    }
+
+    function toggleCart() {
+      const cartModal = document.getElementById('cartModal');
+      cartModal.style.display = cartModal.style.display === 'block' ? 'none' : 'block';
+    }
+
+    document.getElementById('cartBtn').addEventListener('click', toggleCart);
+
+    // Init
+    renderProducts();
+  </script>
+</body>
+</html>
